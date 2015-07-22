@@ -1,7 +1,6 @@
 package net.qays.maana.TakeHomeTest;
 
 import java.io.File;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,18 +13,30 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class CLI {
-    static Logger logger = Logger.getAnonymousLogger(CLI.class.getCanonicalName());
+
+    private static final String OPT_LONG_HELP = "help";
+    private static final String OPT_SHORT_HELP = "h";
+    private static final String OPT_LONG_FOLLOWLINKS = "followlinks";
+    private static final String OPT_SHORT_FOLLOWLINKS = "f";
+    private static final String OPT_LONG_PATH = "path";
+    private static final String OPT_SHORT_PATH = "p";
+    private static final String OPT_LONG_LOGLEVEL = "loglevel";
+    private static final String OPT_SHORT_LOGLEVEL = "l";
+
+    static Logger logger = Logger.getAnonymousLogger();
 
     public static void main(String[] args) {
         Options options = new Options();
 
-        options.addOption(Option.builder("l").longOpt("loglevel").desc("Level of verbosity in logs.").hasArg()
-                .argName("level").numberOfArgs(1).type(Integer.class).build());
-        options.addOption(Option.builder("h").longOpt("help").desc("print this message").build());
-        options.addOption(Option.builder("f").longOpt("followlinks").desc("Follow sym links").hasArg()
-                .argName("followlinks").numberOfArgs(1).type(Boolean.class).build());
-        options.addOption(Option.builder("p").longOpt("path").desc("Top of the tree you want crawled").hasArg()
-                .argName("path").numberOfArgs(1).required().type(File.class).build());
+        options.addOption(
+                Option.builder(OPT_SHORT_LOGLEVEL).longOpt(OPT_LONG_LOGLEVEL).desc("Level of verbosity in logs.")
+                        .hasArg().argName("ALL | FINEST | FINER | FINE | CONFIG | INFO | WARNING | SEVERE | OFF")
+                        .numberOfArgs(1).type(String.class).build());
+        options.addOption(Option.builder(OPT_SHORT_HELP).longOpt(OPT_LONG_HELP).desc("print this message").build());
+        options.addOption(Option.builder(OPT_SHORT_FOLLOWLINKS).longOpt(OPT_LONG_FOLLOWLINKS).desc("Follow sym links")
+                .hasArg().argName("TRUE | FALSE").numberOfArgs(1).type(Boolean.class).build());
+        options.addOption(Option.builder(OPT_SHORT_PATH).longOpt(OPT_LONG_PATH).desc("Top of the tree you want crawled")
+                .hasArg().argName("~/path/to/dir/").numberOfArgs(1).required().type(File.class).build());
 
         // create the parser
         CommandLineParser parser = new DefaultParser();
@@ -38,14 +49,16 @@ public class CLI {
                 return;
             }
 
-            File path = (File) line.getParsedOptionValue("path");
-            Optional<Integer> loglevel = Optional.of((Integer) line.getParsedOptionValue("loglevel"));
-            Optional<Boolean> followlinks = Optional.of((Boolean) line.getParsedOptionValue("followlinks"));
+            File path = (File) line.getParsedOptionValue(OPT_LONG_PATH);
+            String loglevel = line.getOptionValue(OPT_LONG_LOGLEVEL, "WARNING");
+            String followlinks = line.getOptionValue(OPT_LONG_FOLLOWLINKS, "false");
 
-            processPath(path, loglevel, followlinks);
+            logger.setLevel(Level.parse(loglevel));
+
+            processPath(path, Boolean.parseBoolean(followlinks));
         } catch (ParseException exp) {
             // oops, something went wrong
-            logger.log(Level.SEVERE, "test");
+            logger.log(Level.SEVERE, "Unable to parse command line options.");
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(CLI.class.getCanonicalName(), options);
@@ -53,7 +66,7 @@ public class CLI {
         }
     }
 
-    private static void processPath(File parsedOptionValue, Optional<Integer> loglevel, Optional<Boolean> followlinks) {
+    private static void processPath(File parsedOptionValue, Boolean followLinks) {
 
     }
 
