@@ -1,6 +1,9 @@
 package net.qays.maana.TakeHomeTest;
 
 import java.io.File;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -11,6 +14,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class CLI {
+	static Logger logger = Logger.getAnonymousLogger(CLI.class.getCanonicalName());
+
 	public static void main(String[] args) {
 		Options options = new Options();
 
@@ -30,10 +35,26 @@ public class CLI {
 			if (line.hasOption('h')) {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp(CLI.class.getCanonicalName(), options);
+				return;
 			}
+
+			File path = (File) line.getParsedOptionValue("path");
+			Optional<Integer> loglevel = Optional.of((Integer) line.getParsedOptionValue("loglevel"));
+			Optional<Boolean> followlinks = Optional.of((Boolean) line.getParsedOptionValue("followlinks"));
+
+			processPath(path, loglevel, followlinks);
 		} catch (ParseException exp) {
 			// oops, something went wrong
+			logger.log(Level.SEVERE, "test");
 			System.err.println("Parsing failed.  Reason: " + exp.getMessage());
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp(CLI.class.getCanonicalName(), options);
+			return;
 		}
 	}
+
+	private static void processPath(File parsedOptionValue, Optional<Integer> loglevel, Optional<Boolean> followlinks) {
+
+	}
+
 }
