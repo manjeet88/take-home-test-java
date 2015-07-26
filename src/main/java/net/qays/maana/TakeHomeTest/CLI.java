@@ -3,7 +3,6 @@ package net.qays.maana.TakeHomeTest;
 import static java.lang.String.format;
 
 import java.io.File;
-import java.io.PrintWriter;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
