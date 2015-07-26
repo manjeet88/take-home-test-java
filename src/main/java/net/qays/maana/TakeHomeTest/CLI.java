@@ -2,7 +2,6 @@ package net.qays.maana.TakeHomeTest;
 
 import java.io.File;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -12,6 +11,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import lombok.extern.java.Log;
+
+@Log
 public class CLI {
 
     private static final String OPT_LONG_HELP = "help";
@@ -22,8 +24,6 @@ public class CLI {
     private static final String OPT_SHORT_PATH = "p";
     private static final String OPT_LONG_LOGLEVEL = "loglevel";
     private static final String OPT_SHORT_LOGLEVEL = "l";
-
-    static Logger logger = Logger.getAnonymousLogger();
 
     public static void main(String[] args) {
         Options options = new Options();
@@ -53,12 +53,12 @@ public class CLI {
             String loglevel = line.getOptionValue(OPT_LONG_LOGLEVEL, "WARNING");
             String followlinks = line.getOptionValue(OPT_LONG_FOLLOWLINKS, "false");
 
-            logger.setLevel(Level.parse(loglevel));
+            log.setLevel(Level.parse(loglevel));
 
             processPath(path, Boolean.parseBoolean(followlinks));
         } catch (ParseException exp) {
             // oops, something went wrong
-            logger.log(Level.SEVERE, "Unable to parse command line options.");
+            log.severe("Unable to parse command line options.");
             System.err.println("Parsing failed.  Reason: " + exp.getMessage());
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(CLI.class.getCanonicalName(), options);
