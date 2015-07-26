@@ -1,7 +1,7 @@
 package net.qays.maana.TakeHomeTest;
 
 import java.io.File;
-import java.util.logging.Level;
+import java.io.PrintWriter;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -11,9 +11,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 
-@Log
+@Slf4j
 public class CLI {
 
     private static final String OPT_LONG_HELP = "help";
@@ -22,52 +22,42 @@ public class CLI {
     private static final String OPT_SHORT_FOLLOWLINKS = "f";
     private static final String OPT_LONG_PATH = "path";
     private static final String OPT_SHORT_PATH = "p";
-    private static final String OPT_LONG_LOGLEVEL = "loglevel";
-    private static final String OPT_SHORT_LOGLEVEL = "l";
 
     public static void main(String[] args) {
         Options options = new Options();
 
-        options.addOption(
-                Option.builder(OPT_SHORT_LOGLEVEL).longOpt(OPT_LONG_LOGLEVEL).desc("Level of verbosity in logs.")
-                        .hasArg().argName("ALL | FINEST | FINER | FINE | CONFIG | INFO | WARNING | SEVERE | OFF")
-                        .numberOfArgs(1).type(String.class).build());
         options.addOption(Option.builder(OPT_SHORT_HELP).longOpt(OPT_LONG_HELP).desc("print this message").build());
         options.addOption(Option.builder(OPT_SHORT_FOLLOWLINKS).longOpt(OPT_LONG_FOLLOWLINKS).desc("Follow sym links")
-                .hasArg().argName("TRUE | FALSE").numberOfArgs(1).type(Boolean.class).build());
+                .hasArg(false).build());
         options.addOption(Option.builder(OPT_SHORT_PATH).longOpt(OPT_LONG_PATH).desc("Top of the tree you want crawled")
                 .hasArg().argName("~/path/to/dir/").numberOfArgs(1).required().type(File.class).build());
+        options.addOption("C", false, "list entries by columns");
 
         // create the parser
         CommandLineParser parser = new DefaultParser();
+        CommandLine line;
+        File path;
         try {
             // parse the command line arguments
-            CommandLine line = parser.parse(options, args);
-            if (line.hasOption('h')) {
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp(CLI.class.getCanonicalName(), options);
-                return;
-            }
-
-            File path = (File) line.getParsedOptionValue(OPT_LONG_PATH);
-            String loglevel = line.getOptionValue(OPT_LONG_LOGLEVEL, "WARNING");
-            String followlinks = line.getOptionValue(OPT_LONG_FOLLOWLINKS, "false");
-
-            log.setLevel(Level.parse(loglevel));
-
-            processPath(path, Boolean.parseBoolean(followlinks));
+            line = parser.parse(options, args);
+            path = (File) line.getParsedOptionValue(OPT_LONG_PATH);
         } catch (ParseException exp) {
             // oops, something went wrong
-            log.severe("Unable to parse command line options.");
-            System.err.println("Parsing failed.  Reason: " + exp.getMessage());
+            log.error("Unable to parse command line options.");
+            log.error("Parsing failed.  Reason: {}", exp.getMessage());
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp(CLI.class.getCanonicalName(), options);
+            formatter.printWrapped(new PrintWriter(System.out), 80, exp.getMessage());
+            return;
+        }
+        if (line.hasOption('h')) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp(CLI.class.getCanonicalName(), options);
             return;
         }
+        Boolean followlinks = line.hasOption(OPT_LONG_FOLLOWLINKS);
+        log.debug("path: {}\nfollow links: {}", path, followlinks);
+        PathWalker pathWalker = PathWalker.builder().path(path).followLinks(followlinks).build();
+        pathWalker.walk();
     }
-
-    private static void processPath(File parsedOptionValue, Boolean followLinks) {
-
-    }
-
 }
