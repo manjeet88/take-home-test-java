@@ -2,6 +2,7 @@ package net.qays.maana.TakeHomeTest;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -35,12 +36,20 @@ public class CLI {
 
         // create the parser
         CommandLineParser parser = new DefaultParser();
-        CommandLine line;
-        File path;
+        Optional<CommandLine> line;
+        Optional<File> path;
         try {
             // parse the command line arguments
-            line = parser.parse(options, args);
-            path = (File) line.getParsedOptionValue(OPT_LONG_PATH);
+            line = Optional.ofNullable(parser.parse(options, args));
+            path = Optional.ofNullable((File) line.map(x -> {
+                try {
+                    return x.getParsedOptionValue(OPT_LONG_PATH);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return Optional.empty();
+            }).orElse(Optional.empty()));
         } catch (ParseException exp) {
             // oops, something went wrong
             log.error("Unable to parse command line options.");
@@ -50,14 +59,18 @@ public class CLI {
             formatter.printWrapped(new PrintWriter(System.out), 80, exp.getMessage());
             return;
         }
-        if (line.hasOption('h')) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp(CLI.class.getCanonicalName(), options);
-            return;
-        }
-        Boolean followlinks = line.hasOption(OPT_LONG_FOLLOWLINKS);
-        log.debug("path: {}\nfollow links: {}", path, followlinks);
-        PathWalker pathWalker = PathWalker.builder().path(path).followLinks(followlinks).build();
-        pathWalker.walk();
+        line.ifPresent(m -> {
+            if (m.hasOption('h')) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp(CLI.class.getCanonicalName(), options);
+                return;
+            }
+            Boolean followlinks = m.hasOption(OPT_LONG_FOLLOWLINKS);
+            log.debug("path: {}\nfollow links: {}", path, followlinks);
+            path.ifPresent(p -> {
+                PathWalker pathWalker = PathWalker.builder().path(p).followLinks(followlinks).build();
+                pathWalker.walk();
+            });
+        });
     }
 }
