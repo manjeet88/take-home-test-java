@@ -65,6 +65,8 @@ public class CLI {
         Boolean followlinks = line.hasOption(OPT_LONG_FOLLOWLINKS);
 
         log.info("path: {}, follow links: {}", path, followlinks);
-        PathWalker.builder().path(path).followLinks(followlinks).build().walk();
+        PathWalker pathWalker = PathWalker.builder().path(path).followLinks(followlinks).build();
+        pathWalker.walk();
+        System.out.println(pathWalker.getCounts());
     }
 }

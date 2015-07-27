@@ -50,7 +50,9 @@ public class PathWalker {
             }
             if (sub.isFile()) {
                 log.debug("    is file");
-                readFile(sub);
+                if (sub.getName().endsWith(".txt")) {
+                    readFile(sub);
+                }
             }
         }
     }
@@ -63,6 +65,7 @@ public class PathWalker {
                 String line;
                 while ((line = br.readLine()) != null) {
                     Lists.newArrayList(line.split(" ")).forEach(word -> {
+                        log.trace("{}: {}", word.length(), word);
                         counts.computeIfPresent(word.length(), (key, value) -> {
                             return value + 1;
                         });
@@ -77,5 +80,9 @@ public class PathWalker {
             e.printStackTrace();
         }
 
+    }
+
+    public Map<Integer, Integer> getCounts() {
+        return counts;
     }
 }
