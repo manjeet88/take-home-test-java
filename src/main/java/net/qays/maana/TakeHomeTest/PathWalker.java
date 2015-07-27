@@ -5,6 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.common.collect.Lists;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +21,8 @@ public class PathWalker {
 
     private final File path;
     private final Boolean followLinks;
+
+    private static final Map<Integer, Integer> counts = new HashMap<>();
 
     public void walk() {
         log.debug("Walk down: {}, follow links: {}", path, followLinks);
@@ -52,15 +58,17 @@ public class PathWalker {
     private void readFile(TFile file) {
         try {
             Reader reader = new TFileReader(file);
-            try {
-                try (BufferedReader br = new BufferedReader(reader)) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        // process the line.
-                        System.out.println(line);
-                    }
+            // TODO: could handle additional charsets here
+            try (BufferedReader br = new BufferedReader(reader)) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    Lists.newArrayList(line.split(" ")).forEach(word -> {
+                        counts.computeIfPresent(word.length(), (key, value) -> {
+                            return value + 1;
+                        });
+                        counts.putIfAbsent(word.length(), 1);
+                    });
                 }
-            } catch (Exception e) {
             } finally {
                 reader.close();
             }
