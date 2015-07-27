@@ -30,3 +30,9 @@ Run it with any of the below commands
 
 ## Current Limitations
 1. Doesn't do much yet!
+
+## Potential Problems
+1. Walks down file tree recursively, could be an issue for deep trees
+2. If follow symlinks is on, right now, we could get stuck in an infinite loop
+  * Possible solution to only follow links 1 deep
+3. Limitations of the TrueVFS library
