@@ -25,11 +25,12 @@ public class PathWalker {
         })) {
             log.debug("found: {}", sub.toString());
             log.debug("{}", sub.getName());
-            log.debug("    is sym link: {}", Files.isSymbolicLink(sub.toPath()));
+            if (Files.isSymbolicLink(new File(sub.getAbsolutePath()).toPath())) {
+                log.debug("    is sym link");
+            }
             if (sub.isDirectory()) { // also works for archives!
                 log.debug("    is directory");
-
-                PathWalker.builder().path(sub).followLinks(followLinks).build().walk();
+                // PathWalker.builder().path(sub).followLinks(followLinks).build().walk();
             }
             if (sub.isFile()) {
                 log.debug("    is file");
