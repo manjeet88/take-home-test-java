@@ -66,10 +66,7 @@ public class PathWalker {
                 while ((line = br.readLine()) != null) {
                     Lists.newArrayList(line.split(" ")).forEach(word -> {
                         log.trace("{}: {}", word.length(), word);
-                        counts.computeIfPresent(word.length(), (key, value) -> {
-                            return value + 1;
-                        });
-                        counts.putIfAbsent(word.length(), 1);
+                        counts.merge(word.length(), 1, Integer::sum);
                     });
                 }
             } finally {
