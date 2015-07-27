@@ -1,14 +1,11 @@
 package net.qays.maana.TakeHomeTest;
 
 import java.io.File;
-
-import org.apache.commons.vfs2.FileObject;
-import org.apache.commons.vfs2.FileSystemException;
-import org.apache.commons.vfs2.FileSystemManager;
-import org.apache.commons.vfs2.VFS;
+import java.nio.file.Files;
 
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import net.java.truevfs.access.TFile;
 
 @Builder
 @Slf4j
@@ -19,20 +16,24 @@ public class PathWalker {
 
     public void walk() {
         log.debug("Walk down: {}, follow links: {}", path, followLinks);
-        try {
-            // Locate the Jar file
-            FileSystemManager fsManager = VFS.getManager();
-            FileObject jarFile = fsManager.resolveFile(new File(System.getProperty("user.home")), path.getPath());
+        TFile entry = new TFile(path);
+        if (entry.isDirectory()) {
+            log.debug("entry is dir: {}", entry.toString());
+        }
+        for (TFile sub : entry.listFiles(x -> {
+            return true;
+        })) {
+            log.debug("found: {}", sub.toString());
+            log.debug("{}", sub.getName());
+            log.debug("    is sym link: {}", Files.isSymbolicLink(sub.toPath()));
+            if (sub.isDirectory()) { // also works for archives!
+                log.debug("    is directory");
 
-            // List the children of the Jar file
-            FileObject[] children = jarFile.getChildren();
-            System.out.println("Children of " + jarFile.getName().getURI());
-            for (int i = 0; i < children.length; i++) {
-                System.out.println(children[i].getName().getBaseName());
+                PathWalker.builder().path(sub).followLinks(followLinks).build().walk();
             }
-        } catch (FileSystemException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            if (sub.isFile()) {
+                log.debug("    is file");
+            }
         }
     }
 }

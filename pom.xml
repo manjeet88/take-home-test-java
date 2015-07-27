@@ -27,5 +27,10 @@
 			<version>1.16.4</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.java.truevfs</groupId>
+			<artifactId>truevfs-profile-default</artifactId>
+			<version>0.11.0</version>
+		</dependency>
 	</dependencies>
 </project>

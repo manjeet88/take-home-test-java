@@ -44,7 +44,7 @@ public class CLI {
             path = new File(
                     line.getOptionValue(OPT_LONG_PATH).replaceFirst(REGEX_TILDE_PATH, System.getProperty("user.home")));
 
-            if (!path.exists() || !path.canRead()) {
+            if (!path.exists() || !path.canRead() || !path.isDirectory()) {
                 log.error("Unable to read file: {}", path.getAbsolutePath());
                 throw new ParseException(format("Unable to read file: %s", path.getAbsolutePath()));
             }
@@ -65,7 +65,6 @@ public class CLI {
         Boolean followlinks = line.hasOption(OPT_LONG_FOLLOWLINKS);
 
         log.info("path: {}, follow links: {}", path, followlinks);
-        PathWalker pathWalker = PathWalker.builder().path(path).followLinks(followlinks).build();
-        pathWalker.walk();
+        PathWalker.builder().path(path).followLinks(followlinks).build().walk();
     }
 }
