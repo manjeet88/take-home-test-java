@@ -68,6 +68,6 @@ public class CLI {
         PathWalker pathWalker = PathWalker.builder().path(path).followLinks(followlinks).build();
         pathWalker.walk();
         log.debug("counts: {}", pathWalker.getCounts());
-        BarChartSample.graph(pathWalker.getCounts());
+        WordLengthMapGrapher.graph(pathWalker.getCounts());
     }
 }

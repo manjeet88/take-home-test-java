@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 
-public class BarChartSample extends Application {
+public class WordLengthMapGrapher extends Application {
     private static Map<Integer, Integer> counts;
 
     @Override
