@@ -67,6 +67,7 @@ public class CLI {
         log.info("path: {}, follow links: {}", path, followlinks);
         PathWalker pathWalker = PathWalker.builder().path(path).followLinks(followlinks).build();
         pathWalker.walk();
-        System.out.println(pathWalker.getCounts());
+        log.debug("counts: {}", pathWalker.getCounts());
+        BarChartSample.graph(pathWalker.getCounts());
     }
 }
