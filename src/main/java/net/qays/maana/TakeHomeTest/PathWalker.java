@@ -11,6 +11,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileReader;
@@ -22,6 +23,7 @@ public class PathWalker {
     private final File path;
     private final Boolean followLinks;
 
+    @Getter
     private static final Map<Integer, Integer> counts = new HashMap<>();
 
     public void walk() {
@@ -57,7 +59,7 @@ public class PathWalker {
         }
     }
 
-    private void readFile(TFile file) {
+    private static void readFile(TFile file) {
         try {
             Reader reader = new TFileReader(file);
             // TODO: could handle additional charsets here
@@ -79,9 +81,5 @@ public class PathWalker {
             e.printStackTrace();
         }
 
-    }
-
-    public Map<Integer, Integer> getCounts() {
-        return counts;
     }
 }

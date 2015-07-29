@@ -19,11 +19,11 @@ public class WordLengthMapGrapher extends Application {
 
     @Override
     public void start(Stage stage) {
-        stage.setTitle("Bar Chart Sample");
+        stage.setTitle("Word Length Graph");
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
         final BarChart<String, Number> bc = new BarChart<String, Number>(xAxis, yAxis);
-        bc.setTitle("Country Summary");
+        bc.setTitle("Word Length Graph");
         xAxis.setLabel("Word Length (Letters)");
         yAxis.setLabel("Count");
         Scene scene = new Scene(bc, 800, 600);
@@ -34,10 +34,10 @@ public class WordLengthMapGrapher extends Application {
         log.debug("key min: {}, max: {}\nval min: {}, max: {}", minKey, maxKey, minVal, maxVal);
         IntStream.range(minKey, maxKey + 1).forEach(slot -> {
             log.debug("Adding bar for word length: {}", slot);
-            XYChart.Series series1 = new XYChart.Series();
-            series1.setName(Integer.toString(slot));
-            series1.getData().add(new XYChart.Data(Integer.toString(slot), counts.getOrDefault(slot, 0)));
-            bc.getData().add(series1);
+            XYChart.Series series = new XYChart.Series();
+            series.setName(Integer.toString(slot));
+            series.getData().add(new XYChart.Data(Integer.toString(slot), counts.getOrDefault(slot, 0)));
+            bc.getData().add(series);
         });
 
         stage.setScene(scene);
